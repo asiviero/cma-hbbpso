@@ -1,0 +1,4 @@
+This code intends to expand BBPSO algorithm by using heavy tailed distributions to perform the particle shifts. It's main purpose is to make it able
+to deal with restrictions to the variables involved.
+
+It's also my graduation project.
