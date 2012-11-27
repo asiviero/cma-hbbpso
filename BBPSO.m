@@ -3,6 +3,9 @@ inertiaWeight = 0.729;
 c1 = 1.49445;
 c2 = 1.49445;
 
+
+% mu+sigma.*randn(1,m); % m numbers from the N(mu,sigma^2)-distribution
+
 % Initializing the particles
 nParticles = 20;
 nIterations = 100;
@@ -26,11 +29,18 @@ for i = 1:nIterations
     tmp = sortrows(pBestVector,dimension+1);
     gBest = horzcat(tmp(1,1),tmp(1,2));
     
+    % Statistical Parameters
+    mu = calculateSwarmMeanVector(swarm,gBest,dimension);
+    sigma = calculateCovarianceMatrix(swarm,gBest,dimension);
+    
     % Iterating over the particles
     for j = 1:nParticles
+        
         % Move particle
-        swarm(j).updateParticleVelocity(gBest,inertiaWeight,c1,c2);
-        swarm(j).updateParticlePosition;
+        bkp_pos = swarm(j).position;
+        swarm(j).position = (mu(j,:)'+sigma(:,:,j)*(randn(1,dimension))')';
+        
+        
         % Check if position found is better than previous
         if(test_function(swarm(j).position(1),swarm(j).position(2)) < pBestVector(j,3))
             swarm(j).pbest = swarm(j).position;
@@ -40,7 +50,7 @@ for i = 1:nIterations
             pBestVector(j,2) = swarm(j).position(2);
             pBestVector(j,3) = test_function(swarm(j).position(1),swarm(j).position(2));
         else % return to previous position
-            swarm(j).position = swarm(j).position - swarm(j).velocity;
+            swarm(j).position = bkp_pos;
         end
         
     end

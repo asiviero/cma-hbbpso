@@ -1,0 +1,9 @@
+function mu = calculateSwarmMeanVector(swarm,gbest,dimension)
+    mu = zeros(size(swarm,2),dimension);
+    for i = 1:size(swarm,2)
+        for j=1:dimension
+            mu(i,j) = swarm(i).pbest(j) + gbest(j);
+        end fo
+    end
+    mu = mu*0.5;
+end
