@@ -40,7 +40,7 @@ for i = 1:nIterations
     
     
     % Statistical Parameters
-    lambda = gammaRand(nu/2,nu/2);
+    lambda = gamrnd(nu/2,nu/2);
     %lambda=1;
     
     mu = calculateSwarmMeanVector(swarm,gBest,dimension);
