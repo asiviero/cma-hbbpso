@@ -1,3 +1,5 @@
+function [gBest,fBest] = BBPSO(functionToOptimize,nParticles,nIterations,dimension,upperBound)
+
 % Program parameters
 inertiaWeight = 0.729;
 c1 = 1.49445;
@@ -7,27 +9,33 @@ c2 = 1.49445;
 % mu+sigma.*randn(1,m); % m numbers from the N(mu,sigma^2)-distribution
 
 % Initializing the particles
-nParticles = 20;
-nIterations = 100;
-dimension = 2;
-upperBound = 100;
+%nParticles = Particle;
+%nIterations = Iterations;
+%dimension = 3;
+%upperBound = 100;
 pBestVector = zeros(nParticles,dimension+1);
 
 swarm = particle.empty(nParticles,0);
 for i = 1:nParticles
-    swarm(i) = particle(2, rand(1,dimension)*upperBound);
+    swarm(i) = particle(dimension, rand(1,dimension)*upperBound);
     swarm(i).pbest = swarm(i).position;
-    pBestVector(i,1) = swarm(i).position(1);
-    pBestVector(i,2) = swarm(i).position(2);
-    pBestVector(i,3) = test_function(swarm(i).position(1),swarm(i).position(2));
+    for j=1:dimension
+        pBestVector(i,j) = swarm(i).position(j);
+    end
+    pBestVector(i,dimension+1) = feval(functionToOptimize,swarm(i).position);
 end
+
+% Defining gBest
+    tmp = sortrows(pBestVector,dimension+1);
+    gBest = zeros(1,dimension);
+    for k = 1:dimension
+        gBest(k) = tmp(1,k);
+    end
 
 % Main Loop
 for i = 1:nIterations
     
-    % Defining gBest
-    tmp = sortrows(pBestVector,dimension+1);
-    gBest = horzcat(tmp(1,1),tmp(1,2));
+    
     
     % Statistical Parameters
     mu = calculateSwarmMeanVector(swarm,gBest,dimension);
@@ -42,17 +50,31 @@ for i = 1:nIterations
         
         
         % Check if position found is better than previous
-        if(test_function(swarm(j).position(1),swarm(j).position(2)) < pBestVector(j,3))
+        %evstrg=strcat('feval(',functionToOptimize,',',swarm(j).position,')');
+        %out = eval(evstrg);     % evaluate desired function with particle j      
+        out = feval(functionToOptimize,swarm(j).position);
+        
+        if(out < pBestVector(j,dimension+1))
             swarm(j).pbest = swarm(j).position;
             
             % Update pBestVector
-            pBestVector(j,1) = swarm(j).position(1);
-            pBestVector(j,2) = swarm(j).position(2);
-            pBestVector(j,3) = test_function(swarm(j).position(1),swarm(j).position(2));
+            for k=1:dimension
+                pBestVector(j,k) = swarm(j).position(k);
+            end
+            
+            pBestVector(j,dimension+1) = out;
         else % return to previous position
             swarm(j).position = bkp_pos;
         end
         
     end
     
+    % Defining gBest
+    tmp = sortrows(pBestVector,dimension+1);
+    gBest = zeros(1,dimension);
+    for k = 1:dimension
+        gBest(k) = tmp(1,k);
+    end
+    fBest = tmp(1,dimension+1);
+end
 end
