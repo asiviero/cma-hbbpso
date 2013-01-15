@@ -1,4 +1,4 @@
-function [gBest,fBest] = HBBPSO_schwefel(functionToOptimize,nParticles,nIterations,dimension,upperBound,nu)
+function [gBest,fBest] = HBBPSO(functionToOptimize,nParticles,nIterations,dimension,upperBound,nu)
 
 % Program parameters
 inertiaWeight = 0.729;

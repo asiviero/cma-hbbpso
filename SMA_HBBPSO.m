@@ -1,4 +1,4 @@
-function [gBest,fBest] = HBBPSO(functionToOptimize,nParticles,nIterations,dimension,upperBound,nu)
+function [gBest,fBest] = SMA_HBBPSO(functionToOptimize,nParticles,nIterations,dimension,upperBound,nu,beta)
 
 % Program parameters
 inertiaWeight = 0.729;
@@ -16,6 +16,7 @@ c2 = 1.49445;
 pBestVector = zeros(nParticles,dimension+1);
 
 swarm = particle.empty(nParticles,0);
+sigma = zeros(dimension,dimension,nParticles);
 
 % Initializing Swarm
 for i = 1:nParticles
@@ -26,6 +27,8 @@ for i = 1:nParticles
     end
     
     pBestVector(i,dimension+1) = feval(functionToOptimize,swarm(i).position);
+    sigma(:,:,i) = eye(dimension);
+    
 end
 
 % Defining gBest
@@ -37,20 +40,26 @@ end
 
 % Main Loop
 for i = 1:nIterations
-    
-    
-    
+    %pBestVector
+    %gBest
+    %gBest'*gBest
     % Statistical Parameters
-    lambda = gammaRand(nu/2,nu/2);
+    lambda = gamrnd(nu/2,nu/2);   
     %lambda=1;
     
     mu = calculateSwarmMeanVector(swarm,gBest,dimension);
-    sigma = calculateCovarianceMatrix(swarm,gBest,dimension);
+    %sigma = calculateCovarianceMatrix(swarm,gBest,dimension);
     % Hierachical
-    sigma = sigma/lambda;
+    %sigma = sigma/lambda;
+    sigma = sigma*(1-beta);
+    
     
     % Iterating over the particles
     for j = 1:nParticles
+        
+        % SMA
+        sigma(:,:,j) = sigma(:,:,j) + beta*(gBest'*gBest);
+        sigma(:,:,j) = sigma(:,:,j)/lambda;
         
         % Move particle
         bkp_pos = swarm(j).position;
